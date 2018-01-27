@@ -85,3 +85,26 @@ See `build.boot` to find the `dev` tasks which is the same as the above
 ```
 boot dev
 ```
+
+## browser repl to talk to the web page in the browser with cljs
+
+In another terminal window, run the following to connect to the repl server
+started by the `cljs-repl` task
+
+```
+boot repl -c
+```
+
+Wait for it to connect and use the `start-repl` task to create a browser repl
+
+```
+boot.user=> (start-repl)
+```
+
+Wait for it to connect and run js in the browser from the repl.
+
+```
+cljs.user=> (.log js/console "w00t")
+```
+
+Check the browser dev tools console to see the output

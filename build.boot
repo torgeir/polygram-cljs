@@ -15,17 +15,24 @@
                   ;; the reload task to reload the browser
                   [adzerk/boot-reload "0.5.2"]
 
+                  ;; the cljs-repl task to start a repl
+                  [adzerk/boot-cljs-repl "0.3.3"]
+                  [com.cemerick/piggieback "0.2.1"] ;; required by cljs-repl
+                  [weasel "0.7.0"] ;; required by cljs-repl
                   ])
 
 
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
-         '[adzerk.boot-reload :refer [reload]])
+         '[adzerk.boot-reload :refer [reload]]
+         '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]])
+
 
 (deftask dev []
   (comp
     (serve :dir "target")
     (watch)
     (reload)
+    (cljs-repl)
     (cljs)
     (target)))
