@@ -4,8 +4,7 @@
 
 
 (defn log [& args]
-  (-> (.-log js/console)
-    (apply args)))
+  (apply (.-log js/console) args))
 
 
 (s/def ::alphabet #{"F"})
