@@ -108,3 +108,7 @@ cljs.user=> (.log js/console "w00t")
 ```
 
 Check the browser dev tools console to see the output
+
+## improved chrome devtools
+
+For improved formatting in the chrome devtools, open `Settings -> Preferences -> Console` and tick `Enable custom formatters`

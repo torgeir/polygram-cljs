@@ -19,19 +19,28 @@
                   [adzerk/boot-cljs-repl "0.3.3"]
                   [com.cemerick/piggieback "0.2.1"] ;; required by cljs-repl
                   [weasel "0.7.0"] ;; required by cljs-repl
+
+                  ;; for spec generators
+                  [org.clojure/test.check "0.9.0"]
+
+                  ;; for improved chrome dev tools
+                  [powerlaces/boot-cljs-devtools "0.2.0"]
+                  [binaryage/devtools "0.9.9"]
                   ])
 
 
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
          '[adzerk.boot-reload :refer [reload]]
-         '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]])
+         '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
+         '[powerlaces.boot-cljs-devtools :refer [cljs-devtools]])
 
 
 (deftask dev []
   (comp
     (serve :dir "target")
     (watch)
+    (cljs-devtools)
     (reload)
     (cljs-repl)
     (cljs)
