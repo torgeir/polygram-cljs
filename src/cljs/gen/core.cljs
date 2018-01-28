@@ -25,26 +25,35 @@
                        :group ::group)))
 
 
-(defn init []
-
+(defn init
+  "Called on page load."
+  []
   (log (s/valid? ::rule (seq "F"))
        (s/valid? ::rule (seq "-F"))
        (s/valid? ::rule (seq "[F]"))
        (s/valid? ::rule (seq "F[-F]"))
-       (s/valid? ::rule (seq "F[-F[+FF]]")))
-  ;; => true true true true true
-
-  )
+       (s/valid? ::rule (seq "F[-F[+FF]]"))))
 
 
-(log (apply str
-            (gen/generate (s/gen ::rule) 4)))
-;; e.g. "FFF[[-]]"
-;; e.g. "-F[F-+]"
-;; e.g. "FF[[[[F]]F+][[+++]FF][F][F++]]F"
-;; e.g. "F[F[[+][-+-][[++F]--FF]]++]+-"
+(defn create-rule
+  "Create a rule of `size` using test.check."
+  [size]
+  (->> (gen/generate (s/gen ::rule) size)
+    (apply str)))
 
-(log (s/conform ::rule (seq "F[-F]")))
+
+(defn parse-rule
+  "Parse a rule to data."
+  [rule]
+  (s/conform ::rule (seq rule)))
+
+
+(def rules (repeatedly #(create-rule 4)))
+(log "Some generated rules:" (take 3 rules))
+;; => ("FFF[[-]]" "-F[F-+]" "F[F[[+][-+-][[++F]--FF]]++]+-")
+
+
+(log "Parsed F[-F]:" (parse-rule "F[-F]"))
 ;; => [[:char "F"]
 ;;     [:group {:push "["
 ;;              :children [[:op "-"] [:char "F"]]
