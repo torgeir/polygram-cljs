@@ -26,6 +26,7 @@
                   ;; for improved chrome dev tools
                   [powerlaces/boot-cljs-devtools "0.2.0"]
                   [binaryage/devtools "0.9.9"]
+                  [binaryage/dirac "1.2.25"]
                   ])
 
 
@@ -33,7 +34,7 @@
          '[pandeiro.boot-http :refer [serve]]
          '[adzerk.boot-reload :refer [reload]]
          '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
-         '[powerlaces.boot-cljs-devtools :refer [cljs-devtools]])
+         '[powerlaces.boot-cljs-devtools :refer [cljs-devtools dirac]])
 
 
 (deftask dev []
@@ -41,6 +42,7 @@
     (serve :dir "target")
     (watch)
     (cljs-devtools)
+    (dirac)
     (reload)
     (cljs-repl)
     (cljs)
