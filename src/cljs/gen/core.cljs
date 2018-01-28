@@ -32,7 +32,10 @@
        (s/valid? ::rule (seq "-F"))
        (s/valid? ::rule (seq "[F]"))
        (s/valid? ::rule (seq "F[-F]"))
-       (s/valid? ::rule (seq "F[-F[+FF]]"))))
+       (s/valid? ::rule (seq "F[-F[+FF]]")))
+  ;; => true true true true true
+
+  )
 
 
 (log (apply str
