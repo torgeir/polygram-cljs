@@ -41,3 +41,9 @@
 ;; e.g. "-F[F-+]"
 ;; e.g. "FF[[[[F]]F+][[+++]FF][F][F++]]F"
 ;; e.g. "F[F[[+][-+-][[++F]--FF]]++]+-"
+
+(log (s/conform ::rule (seq "F[-F]")))
+;; => [[:char "F"]
+;;     [:group {:push "["
+;;              :children [[:op "-"] [:char "F"]]
+;;              :pop "]"}]]
