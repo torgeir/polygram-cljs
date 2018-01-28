@@ -1,6 +1,7 @@
 (ns gen.core
   (:require [clojure.spec.alpha :as s]
-            [clojure.test.check.generators :as gen]))
+            [clojure.test.check.generators :as gen]
+            [quil.core :as q]))
 
 
 (defn log [& args]
@@ -58,3 +59,47 @@
 ;;     [:group {:push "["
 ;;              :children [[:op "-"] [:char "F"]]
 ;;              :pop "]"}]]
+
+(defn create-element [type]
+  (.createElement js/document type))
+
+
+(defn append [parent el]
+  (.appendChild parent el))
+
+
+(def body (.-body js/document))
+
+
+(when-let [old-sketch (.querySelector js/document "#single-sketch")]
+  (.removeChild body old-sketch))
+
+
+(def canvas (create-element "canvas"))
+(set! (.-id canvas) "single-sketch")
+(append body canvas)
+
+
+(defn setup
+  []
+  (q/frame-rate 4)
+  (q/background 200))
+
+
+(defn draw
+  []
+  (q/stroke (q/random 255))
+  (q/stroke-weight (q/random 10))
+  (q/fill (q/random 255))
+
+  (let [diam (q/random 100)
+        x    (q/random (q/width))
+        y    (q/random (q/height))]
+    (q/ellipse x y diam diam)))
+
+
+(q/sketch
+  :host canvas
+  :size [200 200]
+  :setup setup
+  :draw draw)

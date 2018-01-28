@@ -5,6 +5,8 @@
                   [org.clojure/clojurescript "1.9.946"]
                   [org.clojure/core.async "0.4.474"]
 
+                  [quil "2.6.0"]
+
                   ;; the cljs task to compile cljs
                   [adzerk/boot-cljs "2.1.4"]
 
