@@ -63,7 +63,7 @@
        (recur axiom rule (dec steps) new-acc)))))
 
 
-(def tree-chan (async/to-chan "F-[FF]FF"))
+(def tree-chan (async/to-chan "F-[FF]FFe"))
 
 
 (defn create-element [type]
@@ -78,58 +78,46 @@
   (.insertBefore parent el (.-firstChild parent)))
 
 
-(defn setup
-  []
-  (q/frame-rate 10)
-  (q/background 200)
-  {:x 0
-   :y 0
-   :first true})
-
-(defn update-fn
-  [s]
-  (-> s
-    (assoc :first false)
-    (assoc :op (async/poll! tree-chan))))
-
-(defn draw
-  [s]
-  (q/translate 100 200)
-  (q/rotate Math/PI)
-  (when-let [op (:op s)]
-    (log op)
-    (condp = op
-      "F" (do
-            (q/line 0 0 0 20)
-            (q/translate 0 20))
-      "-" (do
-            (q/rotate (- Math/PI 10)))
-      "[" (q/push-matrix)
-      "]" (q/pop-matrix)
-      nil)))
-
-(defn render []
-
-  (def body (.-body js/document))
-
-  (when-let [canvas (.querySelector js/document "canvas")]
-    (.removeChild body canvas))
-
-  (def canvas (create-element "canvas"))
-  (set! (.-id canvas) "w00t")
-  (prepend body canvas)
-
+(defn render [canvas]
   (q/sketch
-    :host "w00t"
+    :host canvas
     :size [200 200]
-    :setup setup
-    :draw draw
-    :update update-fn
+    :setup (fn []
+             (q/frame-rate 10)
+             (q/background 200)
+             {:s (seq "F-[FF]Fe")
+              :n 0
+              :first true})
+    :update (fn [s]
+              (-> s
+                (assoc :first false)
+                (update-in [:n] inc)))
+    :draw (fn [s]
+            (q/translate 100 200)
+            (q/rotate Math/PI)
+            (when-let [op (nth (:s s) (:n s))]
+              (log op)
+              (condp = op
+                "F" (do
+                      (q/line 0 0 0 20)
+                      (q/translate 0 20))
+                "-" (do
+                      (q/rotate (- Math/PI 10)))
+                "[" (q/push-matrix)
+                "]" (q/pop-matrix)
+                "e" (q/exit))))
     :middleware [m/fun-mode])
   )
+
 
 (defn init
   "Called on page load."
   []
-  (.setTimeout js/window #(render) 1000))
+  (log "render"))
+
+
+(def body (.-body js/document))
+(defn $ [sel] (.querySelector body sel))
+(.setTimeout js/window #(render ($ "canvas")) 0)
+
 
