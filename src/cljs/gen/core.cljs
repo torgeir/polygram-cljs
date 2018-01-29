@@ -63,7 +63,7 @@
        (recur axiom rule (dec steps) new-acc)))))
 
 
-(def tree-chan (async/to-chan "F-[FF]FFe"))
+(def tree-chan (async/to-chan "F-[FF]FF"))
 
 
 (defn create-element [type]
