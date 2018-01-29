@@ -85,17 +85,15 @@
     :setup (fn []
              (q/frame-rate 10)
              (q/background 200)
-             {:s (seq "F-[FF]Fe")
-              :n 0
-              :first true})
+             {:first true})
     :update (fn [s]
               (-> s
                 (assoc :first false)
-                (update-in [:n] inc)))
+                (assoc :op (async/poll! tree-chan))))
     :draw (fn [s]
-            (q/translate 100 200)
-            (q/rotate Math/PI)
-            (when-let [op (nth (:s s) (:n s))]
+            (when-let [op (:op s)]
+              (q/translate 100 200)
+              (q/rotate Math/PI)
               (log op)
               (condp = op
                 "F" (do
@@ -105,7 +103,7 @@
                       (q/rotate (- Math/PI 10)))
                 "[" (q/push-matrix)
                 "]" (q/pop-matrix)
-                "e" (q/exit))))
+                nil)))
     :middleware [m/fun-mode])
   )
 
