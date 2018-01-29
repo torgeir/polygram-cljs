@@ -6,6 +6,7 @@
             [quil.core :as q]
             [quil.middleware :as m]))
 
+
 (defn log [& args]
   (apply (.-log js/console) args))
 
@@ -43,19 +44,12 @@
 
 (def rules (repeatedly #(create-rule 4)))
 (comment (log "Some generated rules:" (take 3 rules)))
-;; => ("FFF[[-]]" "-F[F-+]" "F[F[[+][-+-][[++F]--FF]]++]+-")
-
-
-(comment (log "Parsed F[-F]:" (parse-rule "F[-F]")))
-;; => [[:char "F"]
-;;     [:group {:push "["
-;;              :children [[:op "-"] [:char "F"]]
-;;              :pop "]"}]]
 
 
 (defn tree
   "Create a string representing the tree to draw."
   ([axiom rule] (tree axiom rule 2 axiom))
+  ([axiom rule steps] (tree axiom rule steps axiom))
   ([axiom rule steps acc]
    (if (= 0 steps)
      acc
@@ -63,7 +57,7 @@
        (recur axiom rule (dec steps) new-acc)))))
 
 
-(def tree-chan (async/to-chan "F-[FF]FF"))
+(def tree-chan (async/to-chan (tree "F" "F-[FF]+FF" 2)))
 
 
 (defn create-element [type]
@@ -82,8 +76,9 @@
   (q/sketch
     :host canvas
     :size [200 200]
+    :middleware [m/fun-mode]
     :setup (fn []
-             (q/frame-rate 10)
+             (q/frame-rate 60)
              (q/background 200)
              {:first true})
     :update (fn [s]
@@ -91,22 +86,22 @@
                 (assoc :first false)
                 (assoc :op (async/poll! tree-chan))))
     :draw (fn [s]
-            (when-let [op (:op s)]
+            (q/pop-matrix)
+            (when (:first s)
               (q/translate 100 200)
-              (q/rotate Math/PI)
-              (log op)
+              (q/rotate Math/PI))
+            (when-let [op (:op s)]
               (condp = op
                 "F" (do
                       (q/line 0 0 0 20)
                       (q/translate 0 20))
-                "-" (do
-                      (q/rotate (- Math/PI 10)))
+                "-" (q/rotate (- Math/PI 10))
+                "+" (q/rotate (+ Math/PI 10))
                 "[" (q/push-matrix)
                 "]" (q/pop-matrix)
-                nil)))
-    :middleware [m/fun-mode])
-  )
-
+                nil)
+              (q/push-matrix))
+            )))
 
 (defn init
   "Called on page load."
