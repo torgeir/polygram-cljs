@@ -4,11 +4,8 @@
             [clojure.test.check.generators :as gen]
             [cljs.core.async :as async :include-macros true]
             [quil.core :as q]
-            [quil.middleware :as m]))
-
-
-(defn log [& args]
-  (apply (.-log js/console) args))
+            [quil.middleware :as m]
+            [gen.dom :as dom]))
 
 
 (s/def ::alphabet #{"F"})
@@ -43,7 +40,6 @@
 
 
 (def rules (repeatedly #(create-rule 4)))
-(comment (log "Some generated rules:" (take 3 rules)))
 
 
 (defn tree
@@ -56,61 +52,73 @@
      (let [new-acc (string/replace acc axiom rule)]
        (recur axiom rule (dec steps) new-acc)))))
 
-
-(def tree-chan (async/to-chan (tree "F" "F-[FF]+FF" 2)))
-
-
-(defn create-element [type]
-  (.createElement js/document type))
-
-
-(defn append [parent el]
-  (.appendChild parent el))
-
-
-(defn prepend [parent el]
-  (.insertBefore parent el (.-firstChild parent)))
-
+(comment
+  (tree "F"
+        "F+F[-F]"
+        ;;"F[-F[-F++F]][+F[--F]]F"
+        ;;"F[-FF[+F]]F[+F[+F]]"
+        ;;"F[++F[-F]]F[-FF[F]]"
+        ;;"FF[+F][--FF][-F+F]"
+        4))
 
 (defn render [canvas]
-  (q/sketch
-    :host canvas
-    :size [200 200]
-    :middleware [m/fun-mode]
-    :setup (fn []
-             (q/frame-rate 60)
-             (q/background 200)
-             {:first true})
-    :update (fn [s]
-              (-> s
-                (assoc :first false)
-                (assoc :op (async/poll! tree-chan))))
-    :draw (fn [s]
-            (q/pop-matrix)
-            (when (:first s)
-              (q/translate 100 200)
-              (q/rotate Math/PI))
-            (when-let [op (:op s)]
-              (condp = op
-                "F" (do
-                      (q/line 0 0 0 20)
-                      (q/translate 0 20))
-                "-" (q/rotate (- Math/PI 10))
-                "+" (q/rotate (+ Math/PI 10))
-                "[" (q/push-matrix)
-                "]" (q/pop-matrix)
-                nil)
-              (q/push-matrix))
-            )))
+  (let [w (-> js/document .-documentElement .-clientWidth)
+        h (-> js/document .-documentElement .-clientHeight)
+        tree-chan (async/to-chan
+                    ;;(tree "F" (create-rule 20) 2)
+                    (tree "F" "FF[+F][--FF][-F+F]" 5)
+                    ;;(tree "F" "F[-F][+F]F" 10)
+                    )]
+    (q/sketch
+      :host canvas
+      :size [w h]
+      :middleware [m/fun-mode]
+      :setup (fn []
+               (q/frame-rate 1000)
+               (q/background 255)
+               {:first true
+                :n 1})
+      :update (fn [{:keys [n] :as s}]
+                (let [op (async/poll! tree-chan)]
+                  (-> s
+                    (assoc :first false)
+                    (assoc :op op)
+                    (assoc :n (condp = op
+                                "[" (* n 0.8)
+                                "]" (/ n 0.8)
+                                n)))))
+      :draw (fn [{:keys [op n first]}]
+              (q/pop-matrix)
+              (when first
+                (q/translate (/ w 2) (/ h 1.2))
+                (q/rotate Math/PI))
+              (when op
+                (condp = op
+                  "F" (do
+                        (q/stroke-weight (q/random (* 5 n)))
+                        (q/stroke (q/random 255))
+                        (q/stroke (q/random 0 50)
+                                  (q/random 50 200)
+                                  (q/random 0 50))
+                        (let [l (q/random 1 (* 20 n))]
+                          (q/line 0 0 0 l)
+                          (q/translate 0 l)))
+                  "-" (q/rotate (rand -0.55))
+                  "+" (q/rotate (rand 0.90))
+                  "[" (q/push-matrix)
+                  "]" (q/pop-matrix)
+                  nil)
+                (q/push-matrix))
+              ))))
 
 (defn init
   "Called on page load."
   []
-  (log "render"))
+  )
 
 
-(def body (.-body js/document))
-(defn $ [sel] (.querySelector body sel))
-(.setTimeout js/window #(render ($ "canvas")) 0)
-
-
+(.setTimeout js/window
+             (fn []
+               (render (dom/$ "canvas"))
+               )
+             0)
