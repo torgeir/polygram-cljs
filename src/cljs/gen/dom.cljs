@@ -13,7 +13,12 @@
   (.insertBefore parent el (.-firstChild parent)))
 
 
+(defn $ [sel]
+  (.querySelector body sel))
+
+
+(defn $$ [sel]
+  (.querySelectorAll body sel))
+
+
 (def body (.-body js/document))
-
-
-(defn $ [sel] (.querySelector body sel))
