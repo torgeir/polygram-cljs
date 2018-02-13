@@ -107,7 +107,21 @@ Wait for it to connect and run js in the browser from the repl.
 cljs.user=> (.log js/console "w00t")
 ```
 
-Check the browser dev tools console to see the output
+Check the browser dev tools console to see the output.
+
+## run tests
+
+Run tests using `test-cljs` task.
+
+```
+boot test
+```
+
+Use the `test-watch` task to run tasks on change and speak the result.
+
+```
+boot test-watch
+```
 
 ## improved chrome devtools
 

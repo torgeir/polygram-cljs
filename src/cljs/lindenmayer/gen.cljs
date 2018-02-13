@@ -76,7 +76,11 @@
 
 
 (defn step
-  "Run a random applicable rule at an index of units."
+  "Run one step of rule applications on units.
+  Called with 2 args, runs random applicable rule on each unit. Called with 3
+  args, runs random applicable rule on index provided by `index-fn`. Will pull
+  `index-fn` for new a new index until a rule can be applied for the unit at the
+  provided index."
   ([units rules]
    (->> units
      (map-indexed (fn [index unit]
@@ -98,41 +102,10 @@
 
 
 (defn rule-applier
-  "Lazy seq of iterations of applied rules to units."
-  [units rules stepper]
-  (lazy-seq
-    (let [new-units (stepper units rules)]
-      (cons new-units
-            (rule-applier new-units rules stepper)))))
-
-
-(comment
-
-  (let [number-rule [number? (fn [val index arr]
-                               (let [n (int (rand 10))]
-                                 ["L" n "R" val "R" n "L"]))]
-        counter (fn []
-                  (let [tick (atom -1)]
-                    #(swap! tick inc)))]
-
-
-    (println (step [1 "R" 2 "R" 3 "R" 4] [number-rule]))
-
-
-    (->> (rule-applier [1 "R" 2 "R" 3 "R" 4] [number-rule] #(step %1 %2 (counter)))
-      (take 2)
-      (first)
-      (println))
-
-
-    (->> (rule-applier [1 2] [number-rule] #(step %1 %2))
-      (take 2)
-      (println))
-
-
-    (let [units [1 "R" 2 "R" 3 "R" 4]]
-      (->> (rule-applier units [number-rule] #(step %1 %2 (safe-random (count units))))
-        (take 1)
-        (first)
-        (println))))
-  )
+  "Lazy seq of steps of applied rules to units."
+  ([units rules] (rule-applier units rules step))
+  ([units rules stepper]
+   (lazy-seq
+     (let [new-units (stepper units rules)]
+       (cons new-units
+             (rule-applier new-units rules stepper))))))
