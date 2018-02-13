@@ -29,10 +29,12 @@
     (second matching-rule)
     atom))
 
+
 (defn apply-rules
   "Applies rules on whole sequence once"
   [s rules]
   (vec (flatten (map #(apply-rule-on-atom rules %) s))))
+
 
 (defn apply-rules-repeatedly
   "Applies rules on whole sequence a given number of times"
@@ -41,14 +43,12 @@
     input
     (recur (apply-rules input rules) rules (dec steps))))
 
+
 (defn dol-gen
   "Applies deterministic, context-free rules on single axiom a given number of times"
   [axiom rules steps]
   (apply-rules-repeatedly axiom rules steps))
 
-(def number-rule [number? (fn [val index arr]
-                            (let [n (int (rand 10))]
-                              ["L" n "R" val "R" n "L"]))])
 
 (defn safe-random
   "Random non-repeating number from 0 to n."
@@ -71,36 +71,68 @@
 
 (defn apply-rule
   "Apply `rule-fn` at location `index` of `units`."
-  [rule-fn units index]
-  (->> (-> index units rule-fn)
-    (assoc units index)
-    (flatten)
-    (vec)))
+  ([rule-fn units index]
+   (-> index units rule-fn)))
 
 
-(defn next-application
+(defn step
   "Run a random applicable rule at an index of units."
-  ([units rules] (next-application units rules (safe-random (count units))))
+  ([units rules]
+   (->> units
+     (map-indexed (fn [index unit]
+                    (let [rule-fns (applicable-rules units index rules)]
+                      (if (empty? rule-fns)
+                        unit
+                        (apply-rule (rand-nth rule-fns) units index)))))
+     (flatten)
+     (vec)))
   ([units rules index-fn]
-   (let [index (index-fn)
-         rule-fns (applicable-rules units index rules)]
-     (if (empty? rule-fns)
-       (recur units rules index-fn)
-       (apply-rule (rand-nth rule-fns) units index)))))
+   (when-let [index (index-fn)]
+     (let [rule-fns (applicable-rules units index rules)]
+       (if (empty? rule-fns)
+         (recur units rules index-fn)
+         (->> (apply-rule (rand-nth rule-fns) units index)
+           (assoc units index)
+           (flatten)
+           (vec)))))))
 
 
 (defn rule-applier
   "Lazy seq of iterations of applied rules to units."
-  [units rules]
+  [units rules stepper]
   (lazy-seq
-    (let [new-units (next-application units rules)]
+    (let [new-units (stepper units rules)]
       (cons new-units
-            (rule-applier new-units rules)))))
-
-(->> (rule-applier [1 "R" 2 "R" 3 "R" 4] [number-rule])
-  (drop 100)
-  (take 1)
-  (first)
-  (println)) ;; check the devtools log
+            (rule-applier new-units rules stepper)))))
 
 
+(comment
+
+  (let [number-rule [number? (fn [val index arr]
+                               (let [n (int (rand 10))]
+                                 ["L" n "R" val "R" n "L"]))]
+        counter (fn []
+                  (let [tick (atom -1)]
+                    #(swap! tick inc)))]
+
+
+    (println (step [1 "R" 2 "R" 3 "R" 4] [number-rule]))
+
+
+    (->> (rule-applier [1 "R" 2 "R" 3 "R" 4] [number-rule] #(step %1 %2 (counter)))
+      (take 2)
+      (first)
+      (println))
+
+
+    (->> (rule-applier [1 2] [number-rule] #(step %1 %2))
+      (take 2)
+      (println))
+
+
+    (let [units [1 "R" 2 "R" 3 "R" 4]]
+      (->> (rule-applier units [number-rule] #(step %1 %2 (safe-random (count units))))
+        (take 1)
+        (first)
+        (println))))
+  )
