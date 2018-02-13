@@ -46,28 +46,9 @@
   [axiom rules steps]
   (apply-rules-repeatedly axiom rules steps))
 
-(dol-gen "F" [["F", (seq "FF[+F][--FF][-F+F")]] 4)
-
-
-(dol-gen "a" [["a", ["a","b"]],
-              ["b", ["a","a"]]] 4)
-
-(def rule [number? (fn [val index arr]
-                     (let [n (int (rand 10))]
-                       ["L" n "R" val "R" n "L"]))])
-
-(comment
-  ((first rule) "2")
-  ((second rule) 2))
-
-
-(->> [5 \R 5 \R 5 \R 5 \R]
-  (map (fn [letter]
-         (if ((first rule) letter)
-           ((second rule) letter)
-           letter)))
-  (flatten))
-
+(def number-rule [number? (fn [val index arr]
+                            (let [n (int (rand 10))]
+                              ["L" n "R" val "R" n "L"]))])
 
 (defn safe-random
   "Random non-repeating number from 0 to n."
@@ -80,6 +61,7 @@
 
 
 (defn applicable-rules
+  "Find applicable rules for the unit at index of units."
   [units index rules]
   (->> rules
     (filter (fn [[pred fn]]
@@ -87,13 +69,17 @@
     (map second)))
 
 
-(defn apply-rule [rule-fn units index]
-  (flatten (assoc units index (-> index
-                                units
-                                rule-fn))))
+(defn apply-rule
+  "Apply `rule-fn` at location `index` of `units`."
+  [rule-fn units index]
+  (->> (-> index units rule-fn)
+    (assoc units index)
+    (flatten)
+    (vec)))
 
 
 (defn next-application
+  "Run a random applicable rule at an index of units."
   ([units rules] (next-application units rules (safe-random (count units))))
   ([units rules index-fn]
    (let [index (index-fn)
@@ -103,8 +89,18 @@
        (apply-rule (rand-nth rule-fns) units index)))))
 
 
-(let [number-rule [number? (fn [val index arr]
-                             (let [n (int (rand 10))]
-                               ["L" n "R" val "R" n "L"]))]]
-  (next-application [1 \R 2 \R 3 \R 4]
-                    [number-rule]))
+(defn rule-applier
+  "Lazy seq of iterations of applied rules to units."
+  [units rules]
+  (lazy-seq
+    (let [new-units (next-application units rules)]
+      (cons new-units
+            (rule-applier new-units rules)))))
+
+(->> (rule-applier [1 "R" 2 "R" 3 "R" 4] [number-rule])
+  (drop 100)
+  (take 1)
+  (first)
+  (println)) ;; check the devtools log
+
+
