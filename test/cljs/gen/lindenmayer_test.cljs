@@ -29,7 +29,7 @@
          43)))
 
 
-(deftest sequentially-applies-rule-for-all-units-in-one-step []
+(deftest applies-rule-for-all-units-in-one-step []
   (let [number-rule [number? (fn [v] ["L" 1 "R" v "R" 1 "L"])]]
     (is (= (->> (lm/rule-applier [42 "R" 42] [number-rule])
              (take 2)

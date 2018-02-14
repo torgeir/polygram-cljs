@@ -37,7 +37,6 @@
               (condp = op
                 "F" (do
                       (q/stroke-weight (q/random (* 5 n)))
-                      (q/stroke (q/random 255))
                       (q/stroke (q/random 0 50)
                                 (q/random 50 200)
                                 (q/random 0 50))
@@ -55,14 +54,21 @@
 (defn draw
   "Draw a lindenmayer tree to canvas."
   [canvas w h]
-  (let [data (lindenmayer.data/generate "F" (lindenmayer.data/cool-trees 0) 5)]
+  (let [data (lindenmayer.data/generate "F" (lindenmayer.data/cool-trees 3) 5)]
     (turtle canvas w h (async/to-chan data))))
 
+
+(defn draw-it []
+  (timers/immediate
+    #(draw (dom/$ "canvas")
+           (-> js/document .-documentElement .-clientWidth)
+           (-> js/document .-documentElement .-clientHeight))))
 
 
 (defn init
   "Called on page load."
   []
-  (timers/immediate #(draw (dom/$ "canvas")
-                           (-> js/document .-documentElement .-clientWidth)
-                           (-> js/document .-documentElement .-clientHeight))))
+  (println "on-load"))
+
+
+(draw-it)
