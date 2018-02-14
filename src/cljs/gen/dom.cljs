@@ -1,5 +1,7 @@
 (ns gen.dom)
 
+(def body (.-body js/document))
+
 
 (defn create-element [type]
   (.createElement js/document type))
@@ -19,6 +21,3 @@
 
 (defn $$ [sel]
   (.querySelectorAll body sel))
-
-
-(def body (.-body js/document))

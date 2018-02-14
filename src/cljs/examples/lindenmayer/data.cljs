@@ -1,6 +1,5 @@
-(ns lindenmayer.data
-  (:require [lindenmayer.ui]
-            [clojure.string :as string]))
+(ns examples.lindenmayer.data
+  (:require [clojure.string :as string]))
 
 
 (def cool-trees

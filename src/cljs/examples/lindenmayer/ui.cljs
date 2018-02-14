@@ -1,5 +1,8 @@
-(ns lindenmayer.ui
-  (:require [quil.core :as q]
+(ns examples.lindenmayer.ui
+  (:require [gen.dom :as dom]
+            [gen.timers :as timers]
+            [examples.lindenmayer.data :as lindenmayer.data]
+            [quil.core :as q]
             [quil.middleware :as m]
             [cljs.core.async :as async :include-macros true]))
 
@@ -15,7 +18,7 @@
              (q/frame-rate 1000)
              (q/background 255)
              {:first true
-              :n 1})
+              :n     1})
     :update (fn [{:keys [n] :as s}]
               (let [op (async/poll! chan)]
                 (-> s
@@ -47,3 +50,19 @@
                 "]" (q/pop-matrix)
                 nil)
               (q/push-matrix)))))
+
+
+(defn draw
+  "Draw a lindenmayer tree to canvas."
+  [canvas w h]
+  (let [data (lindenmayer.data/generate "F" (lindenmayer.data/cool-trees 0) 5)]
+    (turtle canvas w h (async/to-chan data))))
+
+
+
+(defn init
+  "Called on page load."
+  []
+  (timers/immediate #(draw (dom/$ "canvas")
+                           (-> js/document .-documentElement .-clientWidth)
+                           (-> js/document .-documentElement .-clientHeight))))

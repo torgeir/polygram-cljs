@@ -1,3 +1,0 @@
-{:require  [gen.core]
- :init-fns [gen.core/init]
- :preloads [devtools.preload]}
