@@ -1,8 +1,10 @@
 (ns gen.lindenmayer-test
   (:require-macros [cljs.test :refer [deftest testing is async]])
   (:require [cljs.test]
+            [examples.lindenmayer.data]
             [gen.random :as random]
-            [gen.lindenmayer :as lm]))
+            [gen.lindenmayer :as lm]
+            [clojure.string]))
 
 
 (deftest does-not-repeat-numbers-in-safe-random []
@@ -29,9 +31,8 @@
 
 (deftest sequentially-applies-rule-for-all-units-in-one-step []
   (let [number-rule [number? (fn [v] ["L" 1 "R" v "R" 1 "L"])]]
-    (is (= (->> (lm/rule-applier [42 "R" 42]
-                                 [number-rule])
-             (take 1)
+    (is (= (->> (lm/rule-applier [42 "R" 42] [number-rule])
+             (take 2)
              (first))
            ["L" 1 "R" 42 "R" 1 "L" "R" "L" 1 "R" 42 "R" 1 "L"]))))
 
@@ -47,3 +48,17 @@
 
     (is (= (->> rule-applier (take 2) (last))
            ["R" 44 "R"]))))
+
+
+(deftest can-implement-lindenmayer-tree-generator
+  (let [f?             (partial = "F")
+        replacement    (constantly (seq "F+F[-F]"))
+        f-rule         [f? replacement]
+        tree-generator (lm/rule-applier ["F"] [f-rule])]
+
+    (is (= (->> tree-generator (take 1) (last) (clojure.string/join ""))
+           "F+F[-F]"))
+
+    (is (= (->> tree-generator (take 2) (last) (clojure.string/join ""))
+           "F+F[-F]+F+F[-F][-F+F[-F]]"))))
+

@@ -2,6 +2,7 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.test.check.generators :as gen]))
 
+
 (s/def ::alphabet #{"F"})
 
 
