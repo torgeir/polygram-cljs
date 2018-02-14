@@ -29,6 +29,18 @@
          43)))
 
 
+(deftest rule-application-provides-context []
+  (let [res   (atom [])
+        units ["a" "b" "c"]]
+    (->> (lm/rule-applier units [[string? (fn [& args]
+                                            (swap! res conj args))]])
+      (take 1)
+      (last))
+    (is (= @res [["a" 0 units]
+                 ["b" 1 units]
+                 ["c" 2 units]]))))
+
+
 (deftest applies-rule-for-all-units-in-one-step []
   (let [number-rule [number? (fn [v] ["L" 1 "R" v "R" 1 "L"])]]
     (is (= (->> (lm/rule-applier [42 "R" 42] [number-rule])
