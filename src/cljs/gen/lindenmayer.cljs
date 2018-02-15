@@ -24,7 +24,7 @@
   [units index rules]
   (->> rules
     (filter (fn [[pred fn]]
-              (pred (units index))))
+              (pred (units index) index units)))
     (map second)))
 
 

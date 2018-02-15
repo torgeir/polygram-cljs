@@ -29,6 +29,18 @@
          43)))
 
 
+(deftest rule-predicate-application-provides-context []
+  (let [res   (atom [])
+        units ["a" "b" "c"]]
+    (->> (lm/rule-applier units [[(fn [& args]
+                                    (swap! res conj args)) identity]])
+      (take 1)
+      (last))
+    (is (= @res [["a" 0 units]
+                 ["b" 1 units]
+                 ["c" 2 units]]))))
+
+
 (deftest rule-application-provides-context []
   (let [res   (atom [])
         units ["a" "b" "c"]]
@@ -63,7 +75,7 @@
 
 
 (deftest can-implement-lindenmayer-tree-generator
-  (let [f?             (partial = "F")
+  (let [f?             #(= "F" %)
         replacement    (constantly (seq "F+F[-F]"))
         f-rule         [f? replacement]
         tree-generator (lm/rule-applier ["F"] [f-rule])]

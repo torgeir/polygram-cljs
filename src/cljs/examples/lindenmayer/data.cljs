@@ -15,7 +15,7 @@
 (defn generate
   "Create a string representing the tree to draw."
   ([axiom rule steps]
-   (let [f?          (partial = "F")
+   (let [f?          #(= "F" %)
          replacement (constantly (seq rule))
          f-rule      [f? replacement]]
      (->> (gen.lindenmayer/rule-applier (clojure.string/split axiom "") [f-rule])
