@@ -1,0 +1,3 @@
+{:require  [examples.automata.ui]
+ :init-fns [examples.automata.ui/init]
+ :preloads [devtools.preload]}
