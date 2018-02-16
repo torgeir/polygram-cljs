@@ -1,11 +1,12 @@
 (ns examples.lindenmayer.ui
   (:require [gen.dom :as dom]
             [gen.timers :as timers]
+            [gen.lindenmayer]
             [examples.lindenmayer.data :as lindenmayer.data]
             [quil.core :as q]
             [quil.middleware :as m]
-            [cljs.core.async :as async :include-macros true]))
-
+            [cljs.core.async :as async :include-macros true]
+            ))
 
 (defn turtle
   "Pull operations from chan and draw a lindenmayer tree."
@@ -69,6 +70,5 @@
   "Called on page load."
   []
   (println "on-load"))
-
 
 (draw-it)
