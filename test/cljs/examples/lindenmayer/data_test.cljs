@@ -1,7 +1,6 @@
 (ns examples.lindenmayer.data-test
-  (:require-macros [cljs.test :refer [deftest testing is async]])
   (:require [examples.lindenmayer.data]
-            [cljs.test]))
+            [cljs.test :refer [deftest testing is async] :include-macros true]))
 
 
 (deftest generates-lindenmayer-trees-with-string-input-and-rules

@@ -1,6 +1,5 @@
 (ns gen.lindenmayer-test
-  (:require-macros [cljs.test :refer [deftest testing is async]])
-  (:require [cljs.test]
+  (:require [cljs.test :refer [deftest testing is async] :include-macros true]
             [examples.lindenmayer.data]
             [gen.random :as random]
             [gen.lindenmayer :as lm]
