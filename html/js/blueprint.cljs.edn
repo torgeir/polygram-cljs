@@ -1,0 +1,3 @@
+{:require  [examples.blueprint.ui]
+ :init-fns [examples.blueprint.ui/init]
+ :preloads [devtools.preload]}
