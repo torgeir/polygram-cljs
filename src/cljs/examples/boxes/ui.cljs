@@ -29,18 +29,26 @@
                 s))
     :draw (fn [{:keys [ops paused]}]
             (when (not paused)
-              (q/translate (/ w 2) (/ h 2))
+              (q/translate (/ w 2.4) (/ h 1.8))
               (q/rotate Math/PI)
               (q/background 255)
               (loop [ops ops]
                 (when-let [op (first ops)]
-                  (q/stroke-weight (q/random 10))
-                  (q/stroke (q/random 255))
+                  (q/stroke-weight (q/random 1 10))
+                  (if (> 0.5 (rand 1))
+                    (q/stroke
+                      (q/random 100 150)
+                      (q/random 200 250)
+                      (q/random 0))
+                    (q/stroke
+                      (q/random 0)
+                      (q/random 100 150)
+                      (q/random 200 250)))
                   (cond
-                    (number? op) (let [l (* 20 op)]
+                    (number? op) (let [l (* 80 op)]
                                    (q/line 0 0 0 l)
                                    (q/translate 0 l))
-                    (= "R" op)   (q/rotate (/ Math/PI 2))
+                    (= "R" op)   (q/rotate (+ 0.0008 (/ Math/PI 2)))
                     (= "L" op)   (q/rotate (/ Math/PI -2)))
                   (recur (rest ops))))))))
 
@@ -56,14 +64,10 @@
 
   (let [canvas      (dom/$ "canvas")
         units       [5 "R" 5 "R" 5 "R" 5]
-        number-rule [#(number? %) (fn [v] ["L" 2 "R" v "R" 2 "L"])]
-        split-rule  [#(number? %) (fn [v] (let [vv    (/ v 3)
-                                                below (Math/floor vv)
-                                                above (Math/ceil (- v below))]
-                                            [above below]))]]
+        number-rule [#(number? %) (fn [v] ["L" 2 "R" v "R" 2 "L"])]]
     (async/go-loop [units (gen.lindenmayer/rule-applier
                             units
-                            [number-rule split-rule]
+                            [number-rule]
                             #(gen.lindenmayer/step %1 %2 (random/rand-no-repeat (count %1))))]
       (async/>! chan (first units))
       (recur (rest units)))
