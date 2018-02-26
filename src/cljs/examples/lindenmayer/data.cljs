@@ -18,7 +18,7 @@
    (let [f?          #(= "F" %)
          replacement (constantly (seq rule))
          f-rule      [f? replacement]]
-     (->> (gen.lindenmayer/rule-applier (clojure.string/split axiom "") [f-rule])
+     (->> (gen.lindenmayer/grow (clojure.string/split axiom "") [f-rule])
        (take steps)
        (last)
        (clojure.string/join "")))))

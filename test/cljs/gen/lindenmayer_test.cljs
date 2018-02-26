@@ -30,58 +30,58 @@
 
 (deftest rule-predicate-application-provides-context []
   (let [res   (atom [])
-        units ["a" "b" "c"]]
-    (->> (lm/rule-applier units [[(fn [& args]
-                                    (swap! res conj args)) identity]])
+        axiom ["a" "b" "c"]]
+    (->> (lm/grow axiom [[(fn [& args]
+                            (swap! res conj args)) identity]])
       (take 1)
       (last))
-    (is (= @res [["a" 0 units]
-                 ["b" 1 units]
-                 ["c" 2 units]]))))
+    (is (= @res [["a" 0 axiom]
+                 ["b" 1 axiom]
+                 ["c" 2 axiom]]))))
 
 
 (deftest rule-application-provides-context []
   (let [res   (atom [])
-        units ["a" "b" "c"]]
-    (->> (lm/rule-applier units [[string? (fn [& args]
-                                            (swap! res conj args))]])
+        axiom ["a" "b" "c"]]
+    (->> (lm/grow axiom [[string? (fn [& args]
+                                    (swap! res conj args))]])
       (take 1)
       (last))
-    (is (= @res [["a" 0 units]
-                 ["b" 1 units]
-                 ["c" 2 units]]))))
+    (is (= @res [["a" 0 axiom]
+                 ["b" 1 axiom]
+                 ["c" 2 axiom]]))))
 
 
 (deftest applies-rule-for-all-units-in-one-step []
   (let [number-rule [number? (fn [v] ["L" 1 "R" v "R" 1 "L"])]]
-    (is (= (->> (lm/rule-applier [42 "R" 42] [number-rule])
+    (is (= (->> (lm/grow [42 "R" 42] [number-rule])
              (take 2)
              (first))
            ["L" 1 "R" 42 "R" 1 "L" "R" "L" 1 "R" 42 "R" 1 "L"]))))
 
 
 (deftest applies-rule-for-unit-at-index-given-by-stepper []
-  (let [number-rule  [number? inc]
-        rule-applier (lm/rule-applier ["R" 42 "R"]
-                                      [number-rule]
-                                      #(lm/step %1 %2 (constantly 1)))]
+  (let [number-rule [number? inc]
+        terms       (lm/grow ["R" 42 "R"]
+                             [number-rule]
+                             #(lm/step-one %1 %2 (constantly 1)))]
 
-    (is (= (->> rule-applier (take 1) (first))
+    (is (= (->> terms (take 1) (first))
            ["R" 43 "R"]))
 
-    (is (= (->> rule-applier (take 2) (last))
+    (is (= (->> terms (take 2) (last))
            ["R" 44 "R"]))))
 
 
 (deftest can-implement-lindenmayer-tree-generator
-  (let [f?             #(= "F" %)
-        replacement    (constantly (seq "F+F[-F]"))
-        f-rule         [f? replacement]
-        tree-generator (lm/rule-applier ["F"] [f-rule])]
+  (let [f?          #(= "F" %)
+        replacement (constantly (seq "F+F[-F]"))
+        f-rule      [f? replacement]
+        terms       (lm/grow ["F"] [f-rule])]
 
-    (is (= (->> tree-generator (take 1) (last) (clojure.string/join ""))
+    (is (= (->> terms (take 1) (last) (clojure.string/join ""))
            "F+F[-F]"))
 
-    (is (= (->> tree-generator (take 2) (last) (clojure.string/join ""))
+    (is (= (->> terms (take 2) (last) (clojure.string/join ""))
            "F+F[-F]+F+F[-F][-F+F[-F]]"))))
 

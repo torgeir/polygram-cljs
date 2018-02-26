@@ -1,4 +1,5 @@
-(ns gen.lindenmayer)
+(ns gen.lindenmayer
+  (:require [gen.random :as random]))
 
 ;;   Given alphabet A.
 ;;
@@ -20,58 +21,58 @@
 
 
 (defn applicable-rules
-  "Find applicable rules for the unit at index of units."
-  [units index rules]
+  "Find applicable rules for the unit at index of the term."
+  [term index rules]
   (->> rules
     (filter (fn [[pred fn]]
-              (pred (units index) index units)))
+              (pred (term index) index term)))
     (map second)))
 
 
 (defn apply-rule
-  "Apply `rule-fn` at location `index` of `units`."
-  [rule-fn units index]
-  (rule-fn (units index) index units))
+  "Apply rule function at index of the term."
+  [rule-fn term index]
+  (rule-fn (term index) index term))
 
 
-(defn step-parallel
-  "Runs random applicable rule on each unit."
-  [units rules]
-  (->> units
+(defn step-all
+  "Runs random applicable rule on each unit of the term."
+  [term rules]
+  (->> term
     (map-indexed (fn [index unit]
-                   (let [rule-fns (applicable-rules units index rules)]
+                   (let [rule-fns (applicable-rules term index rules)]
                      (if (empty? rule-fns)
                        unit
-                       (apply-rule (rand-nth rule-fns) units index)))))
+                       (apply-rule (rand-nth rule-fns) term index)))))
     (flatten)
     (vec)))
 
 
-(defn step-at-index
-  "Runs random applicable rule on index returned by index-fn. Repeatedly calls
-  index-fn until a rule can be applied for the unit at the index returned."
-  [units rules index-fn]
-  (when-let [index (index-fn)]
-    (let [rule-fns (applicable-rules units index rules)]
+(defn step-one
+  "Runs random applicable rule on index returned by marker-fn. Repeatedly calls
+  the marker-fn until a rule can be applied for the unit at the index returned."
+  [term rules marker-fn]
+  (when-let [index (marker-fn)]
+    (let [rule-fns (applicable-rules term index rules)]
       (if (empty? rule-fns)
-        (recur units rules index-fn)
-        (->> (apply-rule (rand-nth rule-fns) units index)
-          (assoc units index)
+        (recur term rules marker-fn)
+        (->> (apply-rule (rand-nth rule-fns) term index)
+          (assoc term index)
           (flatten)
           (vec))))))
 
 
-(defn step
-  "Run one step of rule applications on units."
-  ([units rules] (step-parallel units rules))
-  ([units rules index-fn] (step-at-index units rules index-fn)))
+(defn step-random
+  "Runs random applicable rule (if any) at random index."
+  [term rules]
+  (step-one term rules (random/rand-no-repeat (count term))))
 
 
-(defn rule-applier
-  "Lazy seq of steps of applied rules to units."
-  ([units rules] (rule-applier units rules step))
-  ([units rules stepper]
+(defn grow
+  "Lazily grows an axiom by repeatedly applying rules to units of the axiom."
+  ([axiom rules] (grow axiom rules step-all))
+  ([axiom rules step-fn]
    (lazy-seq
-     (let [new-units (stepper units rules)]
-       (cons new-units
-             (rule-applier new-units rules stepper))))))
+     (let [term (step-fn axiom rules)]
+       (cons term
+             (grow term rules step-fn))))))
