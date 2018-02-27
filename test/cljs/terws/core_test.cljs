@@ -64,7 +64,7 @@
   (let [number-rule [number? inc]
         terms       (terws/grow ["R" 42 "R"]
                                 [number-rule]
-                                (terws/step-index #(constantly 1)))]
+                                (terws/step-index (constantly 1)))]
 
     (is (= (->> terms (take 1) (first))
            ["R" 43 "R"]))

@@ -60,7 +60,7 @@
   "Runs random applicable rule on index returned by marker-fn. Repeatedly calls
   the marker-fn until a rule can be applied for the unit at the index returned."
   [term rules marker-fn]
-  (when-let [index (marker-fn)]
+  (when-let [index (marker-fn term rules)]
     (if-let [applied (apply-rand-rule term index rules)]
       (->> applied
         (assoc term index)
@@ -73,8 +73,7 @@
   "Creates stepper to run rule at index returned by marker function. The marker
   function is called with the term and the rules."
   [marker-fn]
-  (fn [term rules]
-    (step-one term rules (marker-fn term rules))))
+  #(step-one %1 %2 marker-fn))
 
 
 (def step-random
