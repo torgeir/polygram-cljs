@@ -20,8 +20,10 @@
 ;;
 ;;   An A-check is a function that takes a sequence over A and an index, and returns a boolean value.
 
+
 (defn applicable-rules
-  "Find applicable rules for the unit at index of the term."
+  "Find applicable rules for the unit at index of the term. Provides index and
+  term as context to predicate."
   [term index rules]
   (->> rules
     (filter (fn [[pred fn]]
@@ -30,7 +32,8 @@
 
 
 (defn apply-rule
-  "Apply rule function at index of the term."
+  "Apply rule function at index of the term. Provides index and term as context
+  to the rule function."
   [rule-fn term index]
   (rule-fn (term index) index term))
 
