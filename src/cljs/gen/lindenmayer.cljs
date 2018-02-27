@@ -48,10 +48,7 @@
   "Runs random applicable rule on each unit of the term."
   [term rules]
   (->> term
-    (map-indexed (fn [index unit]
-                   (if-let [applied (apply-rand-rule term index rules)]
-                     applied
-                     unit)))
+    (map-indexed #(or (apply-rand-rule term %1 rules) %2))
     (flatten)
     (vec)))
 
