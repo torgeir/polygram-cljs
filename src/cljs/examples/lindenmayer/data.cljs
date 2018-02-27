@@ -1,6 +1,6 @@
 (ns examples.lindenmayer.data
-  (:require [clojure.string]
-            [gen.lindenmayer]))
+  (:require [clojure.string :as s]
+            [gen.lindenmayer :refer [grow]]))
 
 
 (def cool-trees
@@ -18,7 +18,7 @@
    (let [f?          #(= "F" %)
          replacement (constantly (seq rule))
          f-rule      [f? replacement]]
-     (->> (gen.lindenmayer/grow (clojure.string/split axiom "") [f-rule])
+     (->> (grow (s/split axiom "") [f-rule])
        (take steps)
        (last)
-       (clojure.string/join "")))))
+       (s/join "")))))

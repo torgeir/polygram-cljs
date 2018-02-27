@@ -1,7 +1,7 @@
 (ns examples.blueprint.ui
   (:require [gen.dom :as dom]
             [gen.timers :as timers]
-            [gen.lindenmayer :as lm]
+            [gen.lindenmayer :refer [grow step-random]]
             [gen.random :as rng]
             [quil.core :as q]
             [quil.middleware :as m]
@@ -15,11 +15,10 @@
 
 (def split-rule [number? #(let [m (int (rand %))] [m (- % m)])])
 
-(def terms
-  (lm/grow
-    axiom
-    [expand-rule expand-rule expand-rule thicken-rule split-rule]
-    lm/step-random))
+(def terms (grow
+             axiom
+             [expand-rule expand-rule expand-rule thicken-rule split-rule]
+             step-random))
 
 (defn turtle
   [unit]

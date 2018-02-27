@@ -2,7 +2,7 @@
   (:require [gen.dom :as dom]
             [gen.random :as random]
             [gen.timers :as timers]
-            [gen.lindenmayer]
+            [gen.lindenmayer :refer [grow step-random]]
             [quil.core :as q]
             [quil.middleware :as m]
             [cljs.core.async :as async :include-macros true]
@@ -60,15 +60,11 @@
 
 
 (defn draw-it []
-
   (let [chan        (async/chan 1)
         canvas      (dom/$ "canvas")
         axiom       [5 "R" 5 "R" 5 "R" 5]
         number-rule [#(number? %) (fn [v] ["L" 2 "R" v "R" 2 "L"])]
-        terms       (gen.lindenmayer/grow
-                      axiom
-                      [number-rule]
-                      gen.lindenmayer/step-random)]
+        terms       (grow axiom [number-rule] step-random)]
 
     (async/go-loop [terms terms]
       (async/>! chan (first terms))
