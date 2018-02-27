@@ -13,13 +13,13 @@
 
 
 (deftest finds-applicable-rules []
-  (let [units       ["a" 2]
+  (let [axiom       ["a" 2]
         number-rule [number? inc]
         rules       [number-rule]]
 
-    (is (empty? (terws/applicable-rules units 0 rules)))
+    (is (empty? (terws/applicable-rules axiom 0 rules)))
 
-    (is (= (terws/applicable-rules units 1 rules)
+    (is (= (terws/applicable-rules axiom 1 rules)
            (list inc)))))
 
 
@@ -29,27 +29,27 @@
 
 
 (deftest rule-predicate-application-provides-context []
-  (let [res   (atom [])
-        axiom ["a" "b" "c"]]
+  (let [results (atom [])
+        axiom   ["a" "b" "c"]]
     (->> (terws/grow axiom [[(fn [& args]
-                               (swap! res conj args)) identity]])
+                               (swap! results conj args)) identity]])
       (take 1)
       (last))
-    (is (= @res [["a" 0 axiom]
-                 ["b" 1 axiom]
-                 ["c" 2 axiom]]))))
+    (is (= @results [["a" 0 axiom]
+                     ["b" 1 axiom]
+                     ["c" 2 axiom]]))))
 
 
 (deftest rule-application-provides-context []
-  (let [res   (atom [])
-        axiom ["a" "b" "c"]]
+  (let [results (atom [])
+        axiom   ["a" "b" "c"]]
     (->> (terws/grow axiom [[string? (fn [& args]
-                                       (swap! res conj args))]])
+                                       (swap! results conj args))]])
       (take 1)
       (last))
-    (is (= @res [["a" 0 axiom]
-                 ["b" 1 axiom]
-                 ["c" 2 axiom]]))))
+    (is (= @results [["a" 0 axiom]
+                     ["b" 1 axiom]
+                     ["c" 2 axiom]]))))
 
 
 (deftest applies-rule-for-all-units-in-one-step []
