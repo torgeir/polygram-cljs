@@ -1,5 +1,6 @@
 (ns gen.lindenmayer
-  (:require [gen.random :as random]))
+  (:require [gen.random :refer [rand-no-repeat]]
+            [gen.macros :refer [unless] :include-macros true]))
 
 ;;   Given alphabet A.
 ;;
@@ -19,7 +20,6 @@
 ;;
 ;;   An A-check is a function that takes a sequence over A and an index, and returns a boolean value.
 
-
 (defn applicable-rules
   "Find applicable rules for the unit at index of the term."
   [term index rules]
@@ -35,15 +35,23 @@
   (rule-fn (term index) index term))
 
 
+(defn apply-rand-rule
+  "Apply random rule from rules at index of the term. Returns nil if no rule was
+  found for the index of the term."
+  [term index rules]
+  (let [rule-fns (applicable-rules term index rules)]
+    (unless (empty? rule-fns)
+            (apply-rule (rand-nth rule-fns) term index))))
+
+
 (defn step-all
   "Runs random applicable rule on each unit of the term."
   [term rules]
   (->> term
     (map-indexed (fn [index unit]
-                   (let [rule-fns (applicable-rules term index rules)]
-                     (if (empty? rule-fns)
-                       unit
-                       (apply-rule (rand-nth rule-fns) term index)))))
+                   (if-let [applied (apply-rand-rule term index rules)]
+                     applied
+                     unit)))
     (flatten)
     (vec)))
 
@@ -53,19 +61,26 @@
   the marker-fn until a rule can be applied for the unit at the index returned."
   [term rules marker-fn]
   (when-let [index (marker-fn)]
-    (let [rule-fns (applicable-rules term index rules)]
-      (if (empty? rule-fns)
-        (recur term rules marker-fn)
-        (->> (apply-rule (rand-nth rule-fns) term index)
-          (assoc term index)
-          (flatten)
-          (vec))))))
+    (if-let [applied (apply-rand-rule term index rules)]
+      (->> applied
+        (assoc term index)
+        (flatten)
+        (vec))
+      (recur term rules marker-fn))))
 
 
-(defn step-random
+(defn step-index
+  "Creates stepper to run rule at index returned by marker function. The marker
+  function is called with the term and the rules."
+  [marker-fn]
+  (fn [term rules]
+    (step-one term rules (marker-fn term rules))))
+
+
+(def step-random
   "Runs random applicable rule (if any) at random index."
-  [term rules]
-  (step-one term rules (random/rand-no-repeat (count term))))
+  (step-index (fn [term _]
+                (rand-no-repeat (count term)))))
 
 
 (defn grow

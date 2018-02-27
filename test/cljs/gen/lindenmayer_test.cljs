@@ -64,7 +64,7 @@
   (let [number-rule [number? inc]
         terms       (lm/grow ["R" 42 "R"]
                              [number-rule]
-                             #(lm/step-one %1 %2 (constantly 1)))]
+                             (lm/step-index #(constantly 1)))]
 
     (is (= (->> terms (take 1) (first))
            ["R" 43 "R"]))
