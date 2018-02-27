@@ -1,4 +1,4 @@
-(ns gen.dom)
+(ns terws.dom)
 
 (def body (.-body js/document))
 

@@ -1,4 +1,4 @@
-(ns gen.log)
+(ns terws.log)
 
 
 (defn log [& args]

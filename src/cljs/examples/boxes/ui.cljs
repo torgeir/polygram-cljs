@@ -1,8 +1,8 @@
 (ns examples.boxes.ui
-  (:require [gen.dom :as dom]
-            [gen.random :as random]
-            [gen.timers :as timers]
-            [gen.lindenmayer :refer [grow step-random]]
+  (:require [terws.dom :as dom]
+            [terws.random :as random]
+            [terws.timers :as timers]
+            [terws.core :refer [grow step-random]]
             [quil.core :as q]
             [quil.middleware :as m]
             [cljs.core.async :as async :include-macros true]

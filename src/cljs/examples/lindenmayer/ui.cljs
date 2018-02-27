@@ -1,6 +1,6 @@
 (ns examples.lindenmayer.ui
-  (:require [gen.dom :as dom]
-            [gen.timers :as timers]
+  (:require [terws.dom :as dom]
+            [terws.timers :as timers]
             [examples.lindenmayer.data :as lindenmayer.data]
             [quil.core :as q]
             [quil.middleware :as m]

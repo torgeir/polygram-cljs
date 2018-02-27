@@ -1,4 +1,4 @@
-(ns gen.macros)
+(ns terws.macros)
 
 (defmacro unless
   [pred a]

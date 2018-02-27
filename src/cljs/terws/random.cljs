@@ -1,4 +1,4 @@
-(ns gen.random)
+(ns terws.random)
 
 
 (defn rand-no-repeat

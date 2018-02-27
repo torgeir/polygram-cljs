@@ -1,8 +1,8 @@
 (ns examples.blueprint.ui
-  (:require [gen.dom :as dom]
-            [gen.timers :as timers]
-            [gen.lindenmayer :refer [grow step-random]]
-            [gen.random :as rng]
+  (:require [terws.dom :as dom]
+            [terws.timers :as timers]
+            [terws.core :refer [grow step-random]]
+            [terws.random :as rng]
             [quil.core :as q]
             [quil.middleware :as m]
             [cljs.core.async :as async :include-macros true]))

@@ -1,6 +1,6 @@
-(ns gen.lindenmayer
-  (:require [gen.random :refer [rand-no-repeat]]
-            [gen.macros :refer [unless] :include-macros true]))
+(ns terws.core
+  (:require [terws.random :refer [rand-no-repeat]]
+            [terws.macros :refer [unless] :include-macros true]))
 
 ;;   Given alphabet A.
 ;;

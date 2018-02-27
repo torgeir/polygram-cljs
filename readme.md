@@ -48,7 +48,7 @@ $ tree
 |-- readme.md
 |-- src
 |   `-- cljs
-|       `-- gen
+|       `-- terws
 |           `-- core.cljs
 `-- target
     |-- index.html
@@ -76,7 +76,7 @@ Use `reload` task to reload the browser on recompile
 boot serve -d target watch reload cljs target
 ```
 
-Edit `src/cljs/gen/core.cljs` to see the browser recompile on change
+Edit `src/cljs/terws/core.cljs` to see the browser recompile on change
 
 ## compose boot tasks into custom tasks
 
