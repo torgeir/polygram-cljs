@@ -1,4 +1,4 @@
-(ns terws.dom)
+(ns polygram.dom)
 
 (def body (.-body js/document))
 

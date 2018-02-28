@@ -1,6 +1,6 @@
 (ns examples.lindenmayer.ui
-  (:require [terws.dom :as dom]
-            [terws.timers :as timers]
+  (:require [polygram.dom :as dom]
+            [polygram.timers :as timers]
             [examples.lindenmayer.data :as lindenmayer.data]
             [quil.core :as q]
             [quil.middleware :as m]

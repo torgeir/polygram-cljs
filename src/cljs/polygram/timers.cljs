@@ -1,4 +1,4 @@
-(ns terws.timers)
+(ns polygram.timers)
 
 
 (defn immediate

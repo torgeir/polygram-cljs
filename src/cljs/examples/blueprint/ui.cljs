@@ -1,8 +1,8 @@
 (ns examples.blueprint.ui
-  (:require [terws.dom :as dom]
-            [terws.timers :as timers]
-            [terws.core :refer [grow step-random]]
-            [terws.random :as rng]
+  (:require [polygram.dom :as dom]
+            [polygram.timers :as timers]
+            [polygram.core :refer [grow step-random]]
+            [polygram.random :as rng]
             [quil.core :as q]
             [quil.middleware :as m]
             [cljs.core.async :as async :include-macros true]))

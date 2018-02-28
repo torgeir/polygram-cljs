@@ -1,6 +1,6 @@
-(ns terws.core
-  (:require [terws.random :refer [rand-no-repeat]]
-            [terws.macros :refer [unless] :include-macros true]))
+(ns polygram.core
+  (:require [polygram.random :refer [rand-no-repeat]]
+            [polygram.macros :refer [unless] :include-macros true]))
 
 ;;   Given alphabet A.
 ;;

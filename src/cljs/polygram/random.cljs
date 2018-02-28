@@ -1,4 +1,4 @@
-(ns terws.random)
+(ns polygram.random)
 
 
 (defn rand-no-repeat

@@ -1,7 +1,7 @@
 (ns examples.automata.ui
-  (:require [terws.dom :as dom]
-            [terws.timers :as timers]
-            [terws.core :refer [grow]]
+  (:require [polygram.dom :as dom]
+            [polygram.timers :as timers]
+            [polygram.core :refer [grow]]
             [quil.core :as q]
             [quil.middleware :as m]
             [cljs.core.async :as async :include-macros true]))

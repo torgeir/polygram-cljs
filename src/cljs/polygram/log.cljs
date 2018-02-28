@@ -1,4 +1,4 @@
-(ns terws.log)
+(ns polygram.log)
 
 
 (defn log [& args]

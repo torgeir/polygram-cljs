@@ -1,4 +1,4 @@
-(ns terws.macros)
+(ns polygram.macros)
 
 (defmacro unless
   [pred a]

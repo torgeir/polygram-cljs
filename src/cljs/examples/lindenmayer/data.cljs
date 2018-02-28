@@ -1,6 +1,6 @@
 (ns examples.lindenmayer.data
   (:require [clojure.string :as s]
-            [terws.core :refer [grow]]))
+            [polygram.core :refer [grow]]))
 
 
 (def cool-trees

@@ -1,8 +1,8 @@
-(ns terws.core-test
+(ns polygram.core-test
   (:require [cljs.test :refer [deftest testing is async] :include-macros true]
             [examples.lindenmayer.data]
-            [terws.random :as random]
-            [terws.core :as terws]
+            [polygram.random :as random]
+            [polygram.core :as polygram]
             [clojure.string]))
 
 
@@ -17,22 +17,22 @@
         number-rule [number? inc]
         rules       [number-rule]]
 
-    (is (empty? (terws/applicable-rules axiom 0 rules)))
+    (is (empty? (polygram/applicable-rules axiom 0 rules)))
 
-    (is (= (terws/applicable-rules axiom 1 rules)
+    (is (= (polygram/applicable-rules axiom 1 rules)
            (list inc)))))
 
 
 (deftest applies-rule []
-  (is (= (terws/apply-rule inc ["a" 42] 1)
+  (is (= (polygram/apply-rule inc ["a" 42] 1)
          43)))
 
 
 (deftest rule-predicate-application-provides-context []
   (let [results (atom [])
         axiom   ["a" "b" "c"]]
-    (->> (terws/grow axiom [[(fn [& args]
-                               (swap! results conj args)) identity]])
+    (->> (polygram/grow axiom [[(fn [& args]
+                                  (swap! results conj args)) identity]])
       (take 1)
       (last))
     (is (= @results [["a" 0 axiom]
@@ -43,8 +43,8 @@
 (deftest rule-application-provides-context []
   (let [results (atom [])
         axiom   ["a" "b" "c"]]
-    (->> (terws/grow axiom [[string? (fn [& args]
-                                       (swap! results conj args))]])
+    (->> (polygram/grow axiom [[string? (fn [& args]
+                                          (swap! results conj args))]])
       (take 1)
       (last))
     (is (= @results [["a" 0 axiom]
@@ -54,7 +54,7 @@
 
 (deftest applies-rule-for-all-units-in-one-step []
   (let [number-rule [number? (fn [v] ["L" 1 "R" v "R" 1 "L"])]]
-    (is (= (->> (terws/grow [42 "R" 42] [number-rule])
+    (is (= (->> (polygram/grow [42 "R" 42] [number-rule])
              (take 2)
              (first))
            ["L" 1 "R" 42 "R" 1 "L" "R" "L" 1 "R" 42 "R" 1 "L"]))))
@@ -62,9 +62,9 @@
 
 (deftest applies-rule-for-unit-at-index-given-by-stepper []
   (let [number-rule [number? inc]
-        terms       (terws/grow ["R" 42 "R"]
-                                [number-rule]
-                                (terws/step-index (constantly 1)))]
+        terms       (polygram/grow ["R" 42 "R"]
+                                   [number-rule]
+                                   (polygram/step-index (constantly 1)))]
 
     (is (= (->> terms (take 1) (first))
            ["R" 43 "R"]))
@@ -77,7 +77,7 @@
   (let [f?          #(= "F" %)
         replacement (constantly (seq "F+F[-F]"))
         f-rule      [f? replacement]
-        terms       (terws/grow ["F"] [f-rule])]
+        terms       (polygram/grow ["F"] [f-rule])]
 
     (is (= (->> terms (take 1) (last) (clojure.string/join ""))
            "F+F[-F]"))
